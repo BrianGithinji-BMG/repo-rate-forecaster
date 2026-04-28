@@ -22,7 +22,7 @@ from http.server import BaseHTTPRequestHandler
 
 import numpy as np
 import pandas as pd
-from xgboost import XGBRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 # --- ARDL coefficients (mirrors src/lib/ardl.ts) ---
 ARDL_CONST = -1.9469
@@ -79,16 +79,13 @@ def fit_xgb_residual(df: pd.DataFrame):
 
     X = df[["inflation", "log_m2"]].values
     y = df["resid"].values
-    model = XGBRegressor(
+    # GradientBoostingRegressor stands in for XGBRegressor on Vercel —
+    # xgboost wheels exceed the 500 MB Lambda limit, sklearn fits comfortably.
+    model = GradientBoostingRegressor(
         n_estimators=10,
         max_depth=3,
         learning_rate=0.01,
         subsample=0.5,
-        colsample_bytree=0.5,
-        reg_alpha=2,
-        reg_lambda=2,
-        min_child_weight=3,
-        gamma=0.5,
         random_state=1,
     )
     model.fit(X, y)
@@ -96,20 +93,15 @@ def fit_xgb_residual(df: pd.DataFrame):
 
 
 def fit_xgb_pure(df: pd.DataFrame):
-    """Pure XGBoost on raw features (notebook cell 139-140)."""
+    """Pure boosting on raw features (notebook cell 139-140)."""
     df = df.copy()
     X = df[["inflation", "m2", "usd_ksh"]].values
     y = df["repo"].values
-    model = XGBRegressor(
+    model = GradientBoostingRegressor(
         n_estimators=50,
         max_depth=3,
         learning_rate=0.03,
         subsample=0.5,
-        colsample_bytree=0.5,
-        reg_alpha=1,
-        reg_lambda=1,
-        min_child_weight=3,
-        gamma=0.5,
         random_state=1,
     )
     model.fit(X, y)

@@ -9,3 +9,5 @@ out/
 .python-version
 __pycache__/
 *.pyc
+
+.vercel
