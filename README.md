@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Repo Rate Forecaster — Hybrid ARDL × XGBoost
 
-## Getting Started
+An interactive web app that forecasts Kenya's monthly Central Bank Repo Rate
+using the hybrid **ARDL + XGBoost** framework from the BFE 4.2 dissertation
+*"Predicting Repurchase Rates Using a Hybrid ARDL–XGBoost Model"*.
 
-First, run the development server:
+## Features
+
+- **Three models in one UI** — pick ARDL, XGBoost, or the Hybrid combination
+- **Live forecasts** with confidence bands and per-month contribution breakdown
+- **Quick presets** — late-2024 baseline, easing scenario, inflation-shock scenario
+- **Editable lag history** so you can stress-test the model against custom paths
+- **Warm light theme**, Framer Motion micro-interactions, Recharts visualisations
+
+## Tech
+
+- **Next.js 16** App Router + TypeScript + Tailwind 4
+- **Framer Motion** for animation
+- **Recharts** for the forecast chart
+- **Vercel Python serverless** for XGBoost & Hybrid (uses `xgboost`, `pandas`, `numpy`)
+- ARDL coefficients are hardcoded from the fitted model — pure ARDL forecasts
+  run client-side with zero dependencies
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For XGBoost / Hybrid forecasts you'll be asked to upload a CSV/XLSX with these
+columns:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+date, repo, inflation, usd_ksh, m2
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This is the same shape as `Combined_data.xlsx` from the original notebook.
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+vercel --prod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The Python serverless function lives in `api/forecast.py` with its own
+`requirements.txt`.
